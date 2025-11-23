@@ -8,18 +8,17 @@ from keras.preprocessing.sequence import pad_sequences
 import plotly.graph_objects as go
 import plotly.express as px
 from wordcloud import WordCloud
-from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
-import time
-import warnings
+import matplotlib
+matplotlib.use('Agg')  # Fix untuk Streamlit Cloud
+import matplotlib.pyplot as plt
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 import time
 import warnings
 warnings.filterwarnings('ignore')
 
-# ===== TAMBAH INI (COPY PASTE DARI SINI) =====
+# Download NLTK data
 import nltk
 import ssl
-
 try:
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
@@ -27,22 +26,14 @@ except AttributeError:
 else:
     ssl._create_default_https_context = _create_unverified_https_context
 
-# Download NLTK data
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords', quiet=True)
+# Download required NLTK data
+nltk.download('punkt', quiet=True)
+nltk.download('stopwords', quiet=True)
+nltk.download('punkt_tab', quiet=True)
 
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt', quiet=True)
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 
-try:
-    nltk.data.find('tokenizers/punkt_tab')
-except LookupError:
-    nltk.download('punkt_tab', quiet=True)
-    
 # Page config
 st.set_page_config(
     page_title="Mobile Legends Sentiment Analysis",
@@ -72,15 +63,6 @@ st.markdown("""
 @st.cache_resource
 def load_preprocessing_tools():
     try:
-        import nltk
-        from nltk.corpus import stopwords
-        
-        # Download NLTK data kalau belum ada
-        try:
-            nltk.data.find('corpora/stopwords')
-        except LookupError:
-            nltk.download('stopwords', quiet=True)
-        
         factory = StemmerFactory()
         stemmer = factory.create_stemmer()
         stop_words = set(stopwords.words('indonesian'))
@@ -226,7 +208,6 @@ if page == "🏠 Dashboard":
     
     st.subheader("📋 Algorithm Metrics")
     try:
-        # Convert to float to avoid string comparison errors
         comparison_display = comparison_df.copy()
         for col in ['Naive Bayes', 'LSTM']:
             comparison_display[col] = comparison_display[col].astype(float)
@@ -356,13 +337,12 @@ elif page == "☁️ Word Cloud":
             ax.imshow(wordcloud, interpolation='bilinear')
             ax.axis('off')
             st.pyplot(fig)
+            plt.close(fig)  # Close figure to free memory
         else:
             st.warning(f"No {sentiment} reviews found")
     except Exception as e:
-        st.error(f"Error: {str(e)[:100]}")
+        st.error(f"Error generating word cloud: {str(e)[:100]}")
 
 # Footer
 st.markdown("---")
-
 st.markdown("<center>🎮 Mobile Legends Sentiment Analysis | Naive Bayes vs LSTM</center>", unsafe_allow_html=True)
-
