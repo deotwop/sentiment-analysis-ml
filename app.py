@@ -8,14 +8,41 @@ from keras.preprocessing.sequence import pad_sequences
 import plotly.graph_objects as go
 import plotly.express as px
 from wordcloud import WordCloud
-import matplotlib.pyplot as plt
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+import time
+import warnings
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 import time
 import warnings
 warnings.filterwarnings('ignore')
 
+# ===== TAMBAH INI (COPY PASTE DARI SINI) =====
+import nltk
+import ssl
+
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+
+# Download NLTK data
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords', quiet=True)
+
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt', quiet=True)
+
+try:
+    nltk.data.find('tokenizers/punkt_tab')
+except LookupError:
+    nltk.download('punkt_tab', quiet=True)
+    
 # Page config
 st.set_page_config(
     page_title="Mobile Legends Sentiment Analysis",
@@ -327,4 +354,5 @@ elif page == "☁️ Word Cloud":
 
 # Footer
 st.markdown("---")
+
 st.markdown("<center>🎮 Mobile Legends Sentiment Analysis | Naive Bayes vs LSTM</center>", unsafe_allow_html=True)
