@@ -72,12 +72,21 @@ st.markdown("""
 @st.cache_resource
 def load_preprocessing_tools():
     try:
+        import nltk
+        from nltk.corpus import stopwords
+        
+        # Download NLTK data kalau belum ada
+        try:
+            nltk.data.find('corpora/stopwords')
+        except LookupError:
+            nltk.download('stopwords', quiet=True)
+        
         factory = StemmerFactory()
         stemmer = factory.create_stemmer()
         stop_words = set(stopwords.words('indonesian'))
         return stemmer, stop_words
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Error loading preprocessing tools: {e}")
         st.stop()
 
 # Load models
@@ -356,3 +365,4 @@ elif page == "☁️ Word Cloud":
 st.markdown("---")
 
 st.markdown("<center>🎮 Mobile Legends Sentiment Analysis | Naive Bayes vs LSTM</center>", unsafe_allow_html=True)
+
